@@ -88,23 +88,19 @@ fun NotesTopBarCompose(
                             )
                     )
 
-                    Surface(
-                        modifier = Modifier.size(40.dp),
-                        shape = RoundedCornerShape(14.dp),
-                        color = MaterialTheme.colorScheme.primaryContainer,
-                        tonalElevation = 4.dp
+                    // Vibrant Brand Logo Badge
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(RoundedCornerShape(14.dp))
                     ) {
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_notes),
-                                contentDescription = "Notes Logo",
-                                modifier = Modifier.size(22.dp),
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer
-                            )
-                        }
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_splash_logo),
+                            contentDescription = "Notes Logo",
+                            modifier = Modifier.fillMaxSize(),
+                            tint = Color.Unspecified
+                        )
                     }
                 }
 

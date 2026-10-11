@@ -89,23 +89,19 @@ fun NavHeaderCompose(
                             )
                     )
 
-                    Surface(
-                        modifier = Modifier.size(44.dp),
-                        shape = RoundedCornerShape(16.dp),
-                        color = MaterialTheme.colorScheme.surface,
-                        tonalElevation = 6.dp
+                    // Vibrant Brand Logo Badge
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .size(44.dp)
+                            .clip(RoundedCornerShape(16.dp))
                     ) {
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_app_logo),
-                                contentDescription = "KNotes Logo",
-                                modifier = Modifier.size(28.dp),
-                                tint = Color.Unspecified
-                            )
-                        }
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_splash_logo),
+                            contentDescription = "KNotes Logo",
+                            modifier = Modifier.fillMaxSize(),
+                            tint = Color.Unspecified
+                        )
                     }
                 }
 

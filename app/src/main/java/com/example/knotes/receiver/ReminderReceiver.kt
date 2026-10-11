@@ -41,6 +41,8 @@ class ReminderReceiver : BroadcastReceiver() {
                 when (intent.action) {
                     "ACTION_TASK_REMINDER" -> handleTaskReminder(context, intent)
                     "ACTION_NOTE_REMINDER" -> handleNoteReminder(context, intent)
+                    "ACTION_MARK_TASK_DONE" -> handleMarkTaskDone(context, intent)
+                    "ACTION_SNOOZE_TASK" -> handleSnoozeTask(context, intent)
                     else -> {
                         val title = intent.getStringExtra("title") ?: "Reminder"
                         val content = intent.getStringExtra("content") ?: "You have a reminder."
@@ -99,7 +101,8 @@ class ReminderReceiver : BroadcastReceiver() {
             id = notificationId,
             title = "📌 Task Reminder: ${task.title}",
             content = content,
-            targetScreen = "tasks"
+            targetScreen = "tasks",
+            taskId = taskId
         )
         Log.d(TAG, "REMINDER_DELIVERED taskId=$taskId notificationId=$notificationId")
 
@@ -167,5 +170,41 @@ class ReminderReceiver : BroadcastReceiver() {
         // Clear reminderTime on note after delivery so it doesn't re-trigger
         val updatedNote = note.copy(reminderTime = null)
         noteRepository.updateNote(updatedNote)
+    }
+
+    private suspend fun handleMarkTaskDone(context: Context, intent: Intent) {
+        val taskId = intent.getIntExtra("taskId", 0)
+        val notificationId = intent.getIntExtra("notificationId", 0)
+        if (taskId != 0) {
+            taskRepository.updateTaskCompletion(taskId, true)
+            if (notificationId != 0) {
+                val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+                nm.cancel(notificationId)
+            }
+            kotlinx.coroutines.withContext(Dispatchers.Main) {
+                android.widget.Toast.makeText(context, "Task marked as done ✓", android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private suspend fun handleSnoozeTask(context: Context, intent: Intent) {
+        val taskId = intent.getIntExtra("taskId", 0)
+        val notificationId = intent.getIntExtra("notificationId", 0)
+        if (taskId != 0) {
+            val task = taskRepository.getTaskById(taskId)
+            if (task != null) {
+                val snoozedTime = System.currentTimeMillis() + 15 * 60 * 1000L
+                val updatedTask = task.copy(reminderTime = snoozedTime)
+                taskRepository.updateTask(updatedTask)
+                taskReminderManager.scheduleTaskReminders(updatedTask)
+                if (notificationId != 0) {
+                    val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+                    nm.cancel(notificationId)
+                }
+                kotlinx.coroutines.withContext(Dispatchers.Main) {
+                    android.widget.Toast.makeText(context, "Task snoozed for 15 minutes ⏰", android.widget.Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 }

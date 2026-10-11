@@ -8,32 +8,32 @@
     <!-- Stylized KNotes 'K' inside 66dp adaptive safe zone (viewport 108x108) -->
     <!-- Vertical stem -->
     <path
-        android:pathData="M38,32 V76"
-        android:strokeWidth="9"
+        android:pathData="M38,30 V78"
+        android:strokeWidth="10"
         android:strokeColor="#FFFFFF"
         android:strokeLineCap="round" />
 
     <!-- Top arm -->
     <path
-        android:pathData="M38,54 L68,32"
-        android:strokeWidth="9"
+        android:pathData="M38,54 L72,30"
+        android:strokeWidth="10"
         android:strokeColor="#FFFFFF"
         android:strokeLineCap="round" />
 
     <!-- Bottom arm -->
     <path
-        android:pathData="M41,54 L71,76"
-        android:strokeWidth="9"
+        android:pathData="M41,54 L75,78"
+        android:strokeWidth="10"
         android:strokeColor="#FFFFFF"
         android:strokeLineCap="round" />
 
-    <!-- Sparkle/Dot Accent -->
+    <!-- Gold Sparkle Accent Ball -->
     <path
-        android:pathData="M78,58 A5,5 0 1,1 68,58 A5,5 0 1,1 78,58"
+        android:pathData="M84,58 A5.5,5.5 0 1,1 73,58 A5.5,5.5 0 1,1 84,58"
         android:fillColor="#FFD54F" />
 
-    <!-- Four-Point Star Sparkle -->
+    <!-- Teal Magic Star Sparkle -->
     <path
-        android:pathData="M73,34 L75,30 L77,34 L81,36 L77,38 L75,42 L73,38 L69,36 Z"
-        android:fillColor="#D0BCFF" />
+        android:pathData="M76,32 L78,27 L80,32 L85,34 L80,36 L78,41 L76,36 L71,34 Z"
+        android:fillColor="#80DEEA" />
 </vector>
