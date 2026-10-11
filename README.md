@@ -18,7 +18,12 @@
 ---
 
 ## 📖 Table of Contents
-- [📐 Architecture & System Design](#-architecture--system-design)
+- [🌳 Tree-Like Architecture & System Design](#-tree-like-architecture--system-design)
+  - [🏛️ 1. Multi-Layer Clean Architecture Graph](#️-1-multi-layer-clean-architecture-graph)
+  - [🔄 2. Offline-First Cloud Synchronization Flow](#-2-offline-first-cloud-synchronization-flow)
+  - [🤖 3. Dual AI Engine Execution Pipeline](#-3-dual-ai-engine-execution-pipeline)
+  - [🔔 4. Exact Alarm & Notification Dispatch Pipeline](#-4-exact-alarm--notification-dispatch-pipeline)
+  - [📁 5. Complete Package Directory Tree](#-5-complete-package-directory-tree)
 - [✨ Deep-Dive Feature Breakdown](#-deep-dive-feature-breakdown)
   - [🧘 1. AI Focus Digest & 528Hz Zen Timer](#1-ai-focus-digest--528hz-zen-timer)
   - [📊 2. Weekly Analytics & 30-Day Habit Heatmap](#2-weekly-analytics--30-day-habit-heatmap)
@@ -33,41 +38,132 @@
 
 ---
 
-## 📐 Architecture & System Design
+## 🌳 Tree-Like Architecture & System Design
 
-KNotes strictly adheres to **Clean Architecture** combined with the **MVVM (Model-View-ViewModel)** design pattern. It enforces a uni-directional data flow (UDF) with immutability guarantees.
-
-```
-                  ┌───────────────────────────────────────────┐
-                  │            PRESENTATION LAYER             │
-                  │   Fragment / Jetpack Compose UI Views     │
-                  │          ViewModel (StateFlow)            │
-                  └─────────────────────┬─────────────────────┘
-                                        │ (Executes)
-                                        ▼
-                  ┌───────────────────────────────────────────┐
-                  │               DOMAIN LAYER                │
-                  │        UseCases & Business Rules          │
-                  │   Repository Interfaces & Domain Models   │
-                  └─────────────────────┬─────────────────────┘
-                                        │ (Implements)
-                                        ▼
-                  ┌───────────────────────────────────────────┐
-                  │                DATA LAYER                 │
-                  │  Room DB (v12)  │  Firebase Firestore     │
-                  │  EncryptedPrefs │  Data Mappers           │
-                  └───────────────────────────────────────────┘
-```
-
-### 🔄 Data Synchronization Pipeline
+KNotes enforces strict **Clean Architecture** combined with **MVVM (Model-View-ViewModel)**. The codebase is organized as an inverted tree hierarchy where dependencies point inward toward the core domain.
 
 ```
-  User Action ──► Local Room DB (v12) ──► UI Emits StateFlow Immediately (0ms Latency)
-                          │
-                          ▼ (Background Coroutine)
-                 Network Available?
-                      ├── YES ──► Sync to Firebase Firestore ──► Remote Backup
-                      └── NO  ──► Queue for Background WorkManager Sync
+                                 🌳 KNOTES SYSTEM TREE
+                                         │
+        ┌────────────────────────────────┼────────────────────────────────┐
+        ▼                                ▼                                ▼
+  📱 PRESENTATION LAYER           🧠 DOMAIN LAYER                   💾 DATA LAYER
+  ├── Views & Screens             ├── Domain Models                 ├── Room Storage (v12)
+  │   ├── HomeCompose             │   ├── Note                      │   ├── NoteDao
+  │   ├── NotesTopBar             │   ├── Task                      │   ├── TaskDao
+  │   ├── TasksHeader             │   └── Folder                    │   └── FolderDao
+  │   └── AnalyticsCompose        ├── UseCases                      ├── Firebase Cloud
+  ├── ViewModels                  │   ├── GetNotesUseCase           │   ├── AuthRepository
+  │   ├── HomeViewModel           │   ├── GetAnalyticsUseCase       │   └── SyncRepository
+  │   ├── NotesViewModel          │   └── SummarizeNoteUseCase      └── Mappers
+  │   └── AnalyticsViewModel      └── Repository Contracts              ├── NoteMapper
+  └── UI Components                   ├── NoteRepository                └── TaskMapper
+      └── FocusAlarmPlayer            └── TaskRepository
+```
+
+---
+
+### 🏛️ 1. Multi-Layer Clean Architecture Graph
+
+```mermaid
+graph TD
+    subgraph PRESENTATION["📱 Presentation Layer (UI & State)"]
+        UI["Jetpack Compose & Material 3 Views"]
+        VM["ViewModels (StateFlow / UIState)"]
+        UI <--> |Observes State / Emits Events| VM
+    end
+
+    subgraph DOMAIN["🧠 Domain Layer (Pure Business Rules)"]
+        UC["UseCases (GetAnalytics, SummarizeNote)"]
+        DM["Domain Models (Note, Task, Folder)"]
+        CR["Repository Contracts (Interfaces)"]
+        VM --> |Invokes| UC
+        UC --> |Operates on| DM
+        UC --> |Calls| CR
+    end
+
+    subgraph DATA["💾 Data Layer (Persistence & Remote)"]
+        REPO["Repository Implementations"]
+        ROOM["Room Database v12 (SQLite Local Cache)"]
+        FIREBASE["Firebase Firestore & Auth (Cloud Sync)"]
+        CR <---|Implements| REPO
+        REPO <--> |Local Offline First| ROOM
+        REPO <--> |Background Sync| FIREBASE
+    end
+```
+
+---
+
+### 🔄 2. Offline-First Cloud Synchronization Flow
+
+```mermaid
+flowchart LR
+    A["✏️ User Edits Note / Task"] --> B["💾 Local Room DB (v12)"]
+    B --> C["⚡ StateFlow Emits to UI (0ms Latency)"]
+    B --> D{"🌐 Network Connected?"}
+    D -- Yes --> E["☁️ Push to Firebase Firestore"]
+    D -- No --> F["⏳ Queue WorkManager Background Job"]
+    F --> |On Network Restored| E
+```
+
+---
+
+### 🤖 3. Dual AI Engine Execution Pipeline
+
+```mermaid
+flowchart TD
+    A["👤 User Triggers AI Action (Chat / Summary / OCR)"] --> B["🧠 AiViewModel"]
+    B --> C{"🌐 Selected Engine?"}
+    C -- Default / Speed --> D["⚡ Groq API (Llama 3 70B Engine)"]
+    C -- Vision / Image --> E["💎 Google Gemini 1.5 Pro SDK"]
+    D --> F["✨ AI Response Parsed & Markdown Formatted"]
+    E --> F
+    F --> G["📱 Emits to AiUiState -> Renders On-Screen"]
+```
+
+---
+
+### 🔔 4. Exact Alarm & Notification Dispatch Pipeline
+
+```mermaid
+flowchart TD
+    A["📅 Task Created with Deadline / Reminder"] --> B["⏰ TaskReminderManager"]
+    B --> C["⚡ AlarmManager.setExactAndAllowWhileIdle"]
+    C --> |Exact Target Time| D["📡 ReminderReceiver (Broadcast)"]
+    D --> E["🔔 NotificationHelper (Heads-Up Banner & Zen Chime)"]
+    E --> F{"👤 Notification Shade Action"}
+    F -- "✓ Mark Done" --> G["💾 Task marked completed in Room DB"]
+    F -- "⏰ Snooze 15m" --> H["⏰ Rescheduled 15 minutes later"]
+```
+
+---
+
+### 📁 5. Complete Package Directory Tree
+
+```
+C:/Users/unknown/KNotes/app/src/main/java/com/example/knotes/
+├── 📁 data/                        # Data Layer Implementation
+│   ├── 📁 dao/                     # Room Data Access Objects (NoteDao, TaskDao, FolderDao)
+│   ├── 📁 entity/                  # Database Table Entities
+│   └── 📁 repository/              # Repository Implementations & Cloud Sync Logic
+├── 📁 domain/                      # Domain Layer (Pure Kotlin Business Logic)
+│   ├── 📁 model/                   # Pure Domain Models (Note, Task, Folder)
+│   ├── 📁 repository/              # Repository Interfaces & Contracts
+│   └── 📁 usecase/                 # Pure Business UseCases (Analytics, AI, Export)
+├── 📁 ui/                          # Presentation Layer (Jetpack Compose & Views)
+│   ├── 📁 analytics/               # 30-Day Heatmap & Habit Analytics Screen
+│   ├── 📁 auth/                    # Login, Signup, Email Verification Screens
+│   ├── 📁 components/              # Shared Compose Components (TopBars, Canvas, Digest)
+│   ├── 📁 home/                    # Home Dashboard Screen & ViewModels
+│   ├── 📁 notes/                   # Notes Library, Editor, Version History
+│   ├── 📁 splash/                  # Animated Pulsing Aurora Splash Screen
+│   ├── 📁 tasks/                   # Tasks Screen, Edit Task, Header Cards
+│   └── 📁 theme/                   # Material 3 Color Schemes & Typography
+└── 📁 util/                        # Utility & Engine Services
+    ├── 📄 FocusAlarmPlayer.kt      # 528Hz Solfeggio Zen Meditation Bell Chime
+    ├── 📄 TaskReminderManager.kt   # High-precision AlarmManager scheduler
+    ├── 📄 NotificationHelper.kt    # Actionable notification shade dispatches
+    └── 📄 SecurityManager.kt        # Biometrics & EncryptedPreferences
 ```
 
 ---
