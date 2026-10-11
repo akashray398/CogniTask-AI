@@ -26,6 +26,8 @@ import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.PopupMenu
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -116,6 +118,7 @@ class EditNoteFragment : Fragment() {
 
         setupListeners()
         setupFormattingToolbar()
+        setupSketchSheet()
         observeFolders()
         setupBackNavigation()
         observeAiState()
@@ -254,6 +257,12 @@ class EditNoteFragment : Fragment() {
         
         binding.btnList.setOnClickListener { pushToUndo(); insertMarkdown("- ") }
         binding.btnChecklist.setOnClickListener { pushToUndo(); insertMarkdown("- [ ] ") }
+        
+        // Rich Markdown Table, Code & Canvas Sketch Pad
+        binding.btnTable.setOnClickListener { pushToUndo(); insertMarkdown("\n| Column 1 | Column 2 | Column 3 |\n| --- | --- | --- |\n| Data 1 | Data 2 | Data 3 |\n") }
+        binding.btnCode.setOnClickListener { pushToUndo(); insertMarkdown("\n```kotlin\n// Enter code here\n```\n") }
+        binding.btnSketch.setOnClickListener { showSketchCanvasDialog() }
+
         binding.btnUndo.setOnClickListener { performUndo() }
         binding.btnMic.setOnClickListener { checkAudioPermission() }
     }
@@ -303,6 +312,54 @@ class EditNoteFragment : Fragment() {
         val text = binding.editTextDescription.text
         if (start != -1) {
             text.insert(start, prefix)
+        }
+    }
+
+    private var isSketchDialogVisible by androidx.compose.runtime.mutableStateOf(false)
+
+    private fun setupSketchSheet() {
+        binding.composeSketchSheet.apply {
+            setViewCompositionStrategy(androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                if (isSketchDialogVisible) {
+                    com.example.knotes.ui.components.SketchCanvasDialog(
+                        onSaveSketch = { bitmap ->
+                            saveSketchAndInsert(bitmap)
+                        },
+                        onDismiss = {
+                            isSketchDialogVisible = false
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+    private fun showSketchCanvasDialog() {
+        isSketchDialogVisible = true
+    }
+
+    private fun saveSketchAndInsert(bitmap: android.graphics.Bitmap) {
+        viewLifecycleOwner.lifecycleScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            try {
+                val sketchesDir = java.io.File(requireContext().filesDir, "sketches").apply { mkdirs() }
+                val sketchFile = java.io.File(sketchesDir, "sketch_${System.currentTimeMillis()}.png")
+                val outputStream = java.io.FileOutputStream(sketchFile)
+                bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, outputStream)
+                outputStream.flush()
+                outputStream.close()
+
+                val markdownImage = "\n![Hand-Drawn Sketch](${sketchFile.absolutePath})\n"
+
+                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                    insertMarkdown(markdownImage)
+                    Toast.makeText(requireContext(), "Sketch inserted into note 🎨", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                    Toast.makeText(requireContext(), "Failed to save sketch", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 
