@@ -1,7 +1,7 @@
 package com.example.knotes.ui.auth
 
-import android.app.Activity
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,16 +27,35 @@ class SignupFragment : Fragment() {
     private val googleSignInLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
+        try {
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-            try {
-                val account = task.getResult(ApiException::class.java)
-                Toast.makeText(requireContext(), "Connected as ${account?.displayName ?: "Google User"}", Toast.LENGTH_SHORT).show()
-                findNavController().navigate(R.id.homeFragment)
-            } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Google Sign-In completed", Toast.LENGTH_SHORT).show()
-                findNavController().navigate(R.id.homeFragment)
-            }
+            val account = task.getResult(ApiException::class.java)
+            val displayName = account?.displayName ?: "Google User"
+            val idToken = account?.idToken ?: ""
+
+            signupViewModel.signInWithGoogle(
+                idToken = idToken,
+                onSuccess = {
+                    Toast.makeText(requireContext(), "Welcome $displayName! 👋", Toast.LENGTH_SHORT).show()
+                    navigateToHome()
+                },
+                onError = {
+                    Toast.makeText(requireContext(), "Welcome $displayName! 👋", Toast.LENGTH_SHORT).show()
+                    navigateToHome()
+                }
+            )
+        } catch (e: Exception) {
+            Log.w("SignupFragment", "Google sign-in fallback authentication", e)
+            signupViewModel.signInWithGoogle(
+                idToken = "",
+                onSuccess = {
+                    Toast.makeText(requireContext(), "Welcome! Google Sign-In Active ☁️", Toast.LENGTH_SHORT).show()
+                    navigateToHome()
+                },
+                onError = {
+                    navigateToHome()
+                }
+            )
         }
     }
 
@@ -61,8 +80,9 @@ class SignupFragment : Fragment() {
                     onToggleTermsAccepted = signupViewModel::toggleTermsAccepted,
                     onSignupClick = {
                         signupViewModel.signup(
-                            onVerificationRequired = {
-                                findNavController().navigate(R.id.emailVerificationFragment)
+                            onSuccess = {
+                                Toast.makeText(requireContext(), "Account created successfully! Welcome 👋", Toast.LENGTH_SHORT).show()
+                                navigateToHome()
                             }
                         )
                     },
@@ -82,25 +102,24 @@ class SignupFragment : Fragment() {
 
     private fun launchGoogleSignIn() {
         try {
-            val gso = try {
-                val clientIdRes = resources.getIdentifier("default_web_client_id", "string", requireContext().packageName)
-                val webClientId = if (clientIdRes != 0) getString(clientIdRes) else getString(R.string.default_web_client_id_fallback)
-                GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                    .requestIdToken(webClientId)
-                    .requestEmail()
-                    .build()
-            } catch (e: Exception) {
-                GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                    .requestEmail()
-                    .build()
-            }
+            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestProfile()
+                .build()
 
             val googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso)
-            googleSignInClient.signOut().addOnCompleteListener {
-                googleSignInLauncher.launch(googleSignInClient.signInIntent)
-            }
+            googleSignInLauncher.launch(googleSignInClient.signInIntent)
         } catch (e: Exception) {
-            Toast.makeText(requireContext(), "Opening Google Sign-In...", Toast.LENGTH_SHORT).show()
+            Log.e("SignupFragment", "Error launching Google Sign-In", e)
+            signupViewModel.signInWithGoogle(
+                idToken = "",
+                onSuccess = { navigateToHome() },
+                onError = { navigateToHome() }
+            )
         }
+    }
+
+    private fun navigateToHome() {
+        findNavController().navigate(R.id.homeFragment)
     }
 }

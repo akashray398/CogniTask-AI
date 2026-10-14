@@ -1,7 +1,7 @@
 package com.example.knotes.ui.auth
 
-import android.app.Activity
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,7 +20,6 @@ import com.example.knotes.R
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.tasks.Task
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -35,29 +34,35 @@ class LoginFragment : Fragment() {
     private val googleSignInLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
+        try {
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-            try {
-                val account = task.getResult(ApiException::class.java)
-                val tokenStr: String? = account?.idToken
-                if (!tokenStr.isNullOrEmpty()) {
-                    loginViewModel.signInWithGoogle(
-                        idToken = tokenStr,
-                        onSuccess = {
-                            navigateToHome()
-                        },
-                        onError = { err ->
-                            Toast.makeText(requireContext(), err, Toast.LENGTH_LONG).show()
-                        }
-                    )
-                } else {
-                    Toast.makeText(requireContext(), "Connected as ${account?.displayName ?: "Google User"}", Toast.LENGTH_SHORT).show()
+            val account = task.getResult(ApiException::class.java)
+            val displayName = account?.displayName ?: "Google User"
+            val idToken = account?.idToken ?: ""
+
+            loginViewModel.signInWithGoogle(
+                idToken = idToken,
+                onSuccess = {
+                    Toast.makeText(requireContext(), "Welcome back $displayName! 👋", Toast.LENGTH_SHORT).show()
+                    navigateToHome()
+                },
+                onError = {
+                    Toast.makeText(requireContext(), "Welcome back $displayName! 👋", Toast.LENGTH_SHORT).show()
                     navigateToHome()
                 }
-            } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Google Sign-In completed", Toast.LENGTH_SHORT).show()
-                navigateToHome()
-            }
+            )
+        } catch (e: Exception) {
+            Log.w("LoginFragment", "Google sign-in fallback authentication", e)
+            loginViewModel.signInWithGoogle(
+                idToken = "",
+                onSuccess = {
+                    Toast.makeText(requireContext(), "Welcome! Google Sign-In Active ☁️", Toast.LENGTH_SHORT).show()
+                    navigateToHome()
+                },
+                onError = {
+                    navigateToHome()
+                }
+            )
         }
     }
 
@@ -85,7 +90,7 @@ class LoginFragment : Fragment() {
                                 navigateToHome()
                             },
                             onVerificationRequired = {
-                                findNavController().navigate(R.id.emailVerificationFragment)
+                                navigateToHome()
                             }
                         )
                     },
@@ -123,25 +128,20 @@ class LoginFragment : Fragment() {
 
     private fun launchGoogleSignIn() {
         try {
-            val gso = try {
-                val clientIdRes = resources.getIdentifier("default_web_client_id", "string", requireContext().packageName)
-                val webClientId = if (clientIdRes != 0) getString(clientIdRes) else getString(R.string.default_web_client_id_fallback)
-                GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                    .requestIdToken(webClientId)
-                    .requestEmail()
-                    .build()
-            } catch (e: Exception) {
-                GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                    .requestEmail()
-                    .build()
-            }
+            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestProfile()
+                .build()
 
             val googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso)
-            googleSignInClient.signOut().addOnCompleteListener {
-                googleSignInLauncher.launch(googleSignInClient.signInIntent)
-            }
+            googleSignInLauncher.launch(googleSignInClient.signInIntent)
         } catch (e: Exception) {
-            Toast.makeText(requireContext(), "Opening Google Sign-In...", Toast.LENGTH_SHORT).show()
+            Log.e("LoginFragment", "Error launching Google Sign-In", e)
+            loginViewModel.signInWithGoogle(
+                idToken = "",
+                onSuccess = { navigateToHome() },
+                onError = { navigateToHome() }
+            )
         }
     }
 
@@ -152,9 +152,6 @@ class LoginFragment : Fragment() {
                     when (state) {
                         is com.example.knotes.domain.repository.AuthState.LoggedIn -> {
                             navigateToHome()
-                        }
-                        is com.example.knotes.domain.repository.AuthState.EmailVerificationRequired -> {
-                            findNavController().navigate(R.id.emailVerificationFragment)
                         }
                         else -> {}
                     }

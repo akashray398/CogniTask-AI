@@ -71,7 +71,7 @@ class SignupViewModel @Inject constructor(
         _uiState.update { it.copy(termsAccepted = !it.termsAccepted) }
     }
 
-    fun signup(onVerificationRequired: () -> Unit) {
+    fun signup(onSuccess: () -> Unit) {
         val state = _uiState.value
         if (state.isLoading) return
 
@@ -109,7 +109,7 @@ class SignupViewModel @Inject constructor(
             result.onSuccess {
                 _uiState.update { it.copy(isLoading = false) }
                 syncRepository.startSync(manual = true)
-                onVerificationRequired()
+                onSuccess()
             }.onFailure { exception ->
                 val message = AuthValidator.mapFirebaseException(exception)
                 _uiState.update { it.copy(isLoading = false, errorMessage = message) }
