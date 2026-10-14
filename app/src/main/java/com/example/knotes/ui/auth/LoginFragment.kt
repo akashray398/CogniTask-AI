@@ -123,18 +123,25 @@ class LoginFragment : Fragment() {
 
     private fun launchGoogleSignIn() {
         try {
-            val clientIdRes = resources.getIdentifier("default_web_client_id", "string", requireContext().packageName)
-            val webClientId = if (clientIdRes != 0) getString(clientIdRes) else getString(R.string.default_web_client_id_fallback)
-
-            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(webClientId)
-                .requestEmail()
-                .build()
+            val gso = try {
+                val clientIdRes = resources.getIdentifier("default_web_client_id", "string", requireContext().packageName)
+                val webClientId = if (clientIdRes != 0) getString(clientIdRes) else getString(R.string.default_web_client_id_fallback)
+                GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestIdToken(webClientId)
+                    .requestEmail()
+                    .build()
+            } catch (e: Exception) {
+                GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestEmail()
+                    .build()
+            }
 
             val googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso)
-            googleSignInLauncher.launch(googleSignInClient.signInIntent)
+            googleSignInClient.signOut().addOnCompleteListener {
+                googleSignInLauncher.launch(googleSignInClient.signInIntent)
+            }
         } catch (e: Exception) {
-            Toast.makeText(requireContext(), "Initiating Google Sign-In...", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Opening Google Sign-In...", Toast.LENGTH_SHORT).show()
         }
     }
 

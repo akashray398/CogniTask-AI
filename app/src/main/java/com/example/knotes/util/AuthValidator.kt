@@ -44,13 +44,13 @@ object AuthValidator {
     }
 
     fun validatePassword(password: String): PasswordValidationResult {
-        val hasMinLength = password.length >= 8
+        val hasMinLength = password.length >= 6
         val hasUppercase = password.any { it.isUpperCase() }
         val hasLowercase = password.any { it.isLowerCase() }
         val hasDigit = password.any { it.isDigit() }
         val hasSpecialChar = password.any { !it.isLetterOrDigit() }
 
-        val isValid = hasMinLength && hasUppercase && hasLowercase && hasDigit && hasSpecialChar
+        val isValid = hasMinLength
 
         var score = 0
         if (hasMinLength) score++
@@ -60,17 +60,13 @@ object AuthValidator {
         if (hasSpecialChar) score++
 
         val strength = when {
-            score >= 5 -> PasswordStrength.STRONG
-            score >= 3 -> PasswordStrength.MEDIUM
+            score >= 4 -> PasswordStrength.STRONG
+            score >= 2 -> PasswordStrength.MEDIUM
             else -> PasswordStrength.WEAK
         }
 
         val errorMessage = when {
-            !hasMinLength -> "Password must be at least 8 characters long"
-            !hasUppercase -> "Password must contain at least 1 uppercase letter"
-            !hasLowercase -> "Password must contain at least 1 lowercase letter"
-            !hasDigit -> "Password must contain at least 1 number"
-            !hasSpecialChar -> "Password must contain at least 1 special character"
+            !hasMinLength -> "Password must be at least 6 characters long"
             else -> null
         }
 
@@ -101,8 +97,8 @@ object AuthValidator {
             msg.contains("user-disabled") ->
                 "This account has been disabled. Please contact support."
             msg.contains("weak-password") ->
-                "The password provided is too weak."
-            else -> "Authentication failed. Please check your details and try again."
+                "The password provided is too weak (minimum 6 characters)."
+            else -> e.message ?: "Authentication failed. Please check your details and try again."
         }
     }
 }

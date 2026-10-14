@@ -354,9 +354,9 @@ fun SignupScreenCompose(
                     shape = RoundedCornerShape(16.dp)
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_ai_assist),
+                        painter = painterResource(id = R.drawable.ic_google_logo),
                         contentDescription = "Google Logo",
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = Color.Unspecified,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
