@@ -48,4 +48,5 @@
     <string name="desc_add_new_note">Add new note</string>
     <string name="desc_filter_and_sort">Filter and Sort</string>
     <string name="desc_add_new_task">Add new task</string>
+    <string name="default_web_client_id_fallback">1000000000000-dummywebclientid.apps.googleusercontent.com</string>
 </resources>

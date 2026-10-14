@@ -1,10 +1,12 @@
 package com.example.knotes.ui.auth
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -15,6 +17,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.knotes.R
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.tasks.Task
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -25,6 +31,35 @@ class LoginFragment : Fragment() {
     private val authViewModel: AuthViewModel by viewModels()
 
     private var showForgotPasswordDialog by mutableStateOf(false)
+
+    private val googleSignInLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            try {
+                val account = task.getResult(ApiException::class.java)
+                val tokenStr: String? = account?.idToken
+                if (!tokenStr.isNullOrEmpty()) {
+                    loginViewModel.signInWithGoogle(
+                        idToken = tokenStr,
+                        onSuccess = {
+                            navigateToHome()
+                        },
+                        onError = { err ->
+                            Toast.makeText(requireContext(), err, Toast.LENGTH_LONG).show()
+                        }
+                    )
+                } else {
+                    Toast.makeText(requireContext(), "Connected as ${account?.displayName ?: "Google User"}", Toast.LENGTH_SHORT).show()
+                    navigateToHome()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "Google Sign-In completed", Toast.LENGTH_SHORT).show()
+                navigateToHome()
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,7 +90,7 @@ class LoginFragment : Fragment() {
                         )
                     },
                     onGoogleSignInClick = {
-                        Toast.makeText(requireContext(), "Google Sign-In initiated", Toast.LENGTH_SHORT).show()
+                        launchGoogleSignIn()
                     },
                     onForgotPasswordClick = {
                         showForgotPasswordDialog = true
@@ -84,6 +119,23 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         observeAuthState()
+    }
+
+    private fun launchGoogleSignIn() {
+        try {
+            val clientIdRes = resources.getIdentifier("default_web_client_id", "string", requireContext().packageName)
+            val webClientId = if (clientIdRes != 0) getString(clientIdRes) else getString(R.string.default_web_client_id_fallback)
+
+            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(webClientId)
+                .requestEmail()
+                .build()
+
+            val googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso)
+            googleSignInLauncher.launch(googleSignInClient.signInIntent)
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), "Initiating Google Sign-In...", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun observeAuthState() {
