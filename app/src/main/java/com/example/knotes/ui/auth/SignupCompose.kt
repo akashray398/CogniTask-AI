@@ -1,10 +1,12 @@
 package com.example.knotes.ui.auth
 
 import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -14,6 +16,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -28,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import com.example.knotes.R
 import com.example.knotes.util.PasswordStrength
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignupScreenCompose(
     uiState: SignupUiState,
@@ -45,18 +50,60 @@ fun SignupScreenCompose(
 ) {
     val focusManager = LocalFocusManager.current
 
+    // Breathing background aura animation
+    val infiniteTransition = rememberInfiniteTransition(label = "SignupAura")
+    val auraScale by infiniteTransition.animateFloat(
+        initialValue = 0.85f,
+        targetValue = 1.20f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2800, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "auraScale"
+    )
+
+    val auraAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.15f,
+        targetValue = 0.40f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2800, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "auraAlpha"
+    )
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.surface
     ) {
         Box(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
+            // Background Pulsing Glow
+            Box(
+                modifier = Modifier
+                    .size(340.dp)
+                    .scale(auraScale)
+                    .clip(CircleShape)
+                    .background(
+                        Brush.radialGradient(
+                            colors = listOf(
+                                MaterialTheme.colorScheme.primary.copy(alpha = auraAlpha),
+                                MaterialTheme.colorScheme.primaryContainer.copy(alpha = auraAlpha * 0.5f),
+                                Color.Transparent
+                            )
+                        )
+                    )
+            )
+
+            // Back Navigation Icon
             IconButton(
                 onClick = onNavigateBack,
                 modifier = Modifier
                     .align(Alignment.TopStart)
-                    .padding(16.dp)
+                    .statusBarsPadding()
+                    .padding(12.dp)
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_back),
@@ -69,36 +116,38 @@ fun SignupScreenCompose(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 24.dp, vertical = 64.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .padding(horizontal = 24.dp)
+                    .padding(top = 80.dp, bottom = 40.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                // Header Logo
+                // Brand Logo Badge
                 Box(
+                    contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .size(64.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(MaterialTheme.colorScheme.primaryContainer),
-                    contentAlignment = Alignment.Center
+                        .size(72.dp)
+                        .clip(RoundedCornerShape(22.dp))
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_app_logo),
+                        painter = painterResource(id = R.drawable.ic_splash_logo),
                         contentDescription = "KNotes Logo",
-                        modifier = Modifier.size(36.dp),
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        modifier = Modifier.fillMaxSize(),
+                        tint = Color.Unspecified
                     )
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(18.dp))
 
                 Text(
-                    text = "Create your account",
+                    text = "Create Your Account ✨",
                     style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Black,
+                    fontSize = 28.sp,
                     color = MaterialTheme.colorScheme.onSurface
                 )
 
                 Text(
-                    text = "Start your KNotes productivity journey",
+                    text = "Start your organized productivity journey",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 4.dp)
@@ -106,199 +155,201 @@ fun SignupScreenCompose(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Error Banner
+                // Error Card Banner
                 AnimatedVisibility(visible = uiState.errorMessage != null) {
                     uiState.errorMessage?.let { error ->
                         Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(bottom = 16.dp),
-                            shape = RoundedCornerShape(12.dp),
+                            shape = RoundedCornerShape(14.dp),
                             color = MaterialTheme.colorScheme.errorContainer
                         ) {
                             Text(
                                 text = error,
                                 color = MaterialTheme.colorScheme.onErrorContainer,
                                 style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.padding(12.dp),
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier.padding(14.dp),
                                 textAlign = TextAlign.Center
                             )
                         }
                     }
                 }
 
-                // Full Name
-                OutlinedTextField(
-                    value = uiState.fullName,
-                    onValueChange = onFullNameChanged,
-                    label = { Text("Full Name") },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next
-                    ),
+                // Input Card Container
+                Card(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp)
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // Email
-                OutlinedTextField(
-                    value = uiState.email,
-                    onValueChange = onEmailChanged,
-                    label = { Text("Email Address") },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Email,
-                        imeAction = ImeAction.Next
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f)
                     ),
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp)
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // Password
-                OutlinedTextField(
-                    value = uiState.password,
-                    onValueChange = onPasswordChanged,
-                    label = { Text("Password") },
-                    singleLine = true,
-                    visualTransformation = if (uiState.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    trailingIcon = {
-                        IconButton(onClick = onTogglePasswordVisibility) {
-                            Icon(
-                                painter = painterResource(
-                                    id = if (uiState.isPasswordVisible) R.drawable.ic_save else R.drawable.ic_more
-                                ),
-                                contentDescription = "Toggle password visibility",
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    },
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Password,
-                        imeAction = ImeAction.Next
-                    ),
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp)
-                )
-
-                // Password Strength Feedback Component
-                if (uiState.password.isNotEmpty()) {
-                    val validation = uiState.passwordValidation
-                    val strengthColor = when (validation.strength) {
-                        PasswordStrength.STRONG -> Color(0xFF4CAF50)
-                        PasswordStrength.MEDIUM -> Color(0xFFFF9800)
-                        PasswordStrength.WEAK -> Color(0xFFF44336)
-                    }
-                    val strengthProgress = when (validation.strength) {
-                        PasswordStrength.STRONG -> 1.0f
-                        PasswordStrength.MEDIUM -> 0.6f
-                        PasswordStrength.WEAK -> 0.3f
-                    }
-
+                    border = CardDefaults.outlinedCardBorder(enabled = true)
+                ) {
                     Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp)
+                        modifier = Modifier.padding(18.dp)
                     ) {
-                        Row(
+                        // Full Name
+                        OutlinedTextField(
+                            value = uiState.fullName,
+                            onValueChange = onFullNameChanged,
+                            label = { Text("Full Name") },
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Text,
+                                imeAction = ImeAction.Next
+                            ),
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                text = "Password Strength",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            shape = RoundedCornerShape(16.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
                             )
-                            Text(
-                                text = validation.strength.name,
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = strengthColor
-                            )
-                        }
-
-                        LinearProgressIndicator(
-                            progress = { strengthProgress },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(4.dp)
-                                .clip(RoundedCornerShape(2.dp)),
-                            color = strengthColor,
-                            trackColor = MaterialTheme.colorScheme.surfaceVariant
                         )
 
-                        Spacer(modifier = Modifier.height(6.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
 
-                        // Requirements Checklist
-                        RequirementItem("At least 8 characters", validation.hasMinLength)
-                        RequirementItem("Uppercase letter (A-Z)", validation.hasUppercase)
-                        RequirementItem("Lowercase letter (a-z)", validation.hasLowercase)
-                        RequirementItem("Number (0-9)", validation.hasDigit)
-                        RequirementItem("Special character (!@#$)", validation.hasSpecialChar)
+                        // Email
+                        OutlinedTextField(
+                            value = uiState.email,
+                            onValueChange = onEmailChanged,
+                            label = { Text("Email Address") },
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Email,
+                                imeAction = ImeAction.Next
+                            ),
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+                            )
+                        )
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // Password
+                        OutlinedTextField(
+                            value = uiState.password,
+                            onValueChange = onPasswordChanged,
+                            label = { Text("Password") },
+                            singleLine = true,
+                            visualTransformation = if (uiState.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                            trailingIcon = {
+                                TextButton(onClick = onTogglePasswordVisibility) {
+                                    Text(
+                                        text = if (uiState.isPasswordVisible) "Hide" else "Show",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 12.sp,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            },
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Password,
+                                imeAction = ImeAction.Next
+                            ),
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+                            )
+                        )
+
+                        // Password Strength Indicator
+                        if (uiState.password.isNotEmpty()) {
+                            val validation = uiState.passwordValidation
+                            val strengthColor = when (validation.strength) {
+                                PasswordStrength.STRONG -> Color(0xFF4CAF50)
+                                PasswordStrength.MEDIUM -> Color(0xFFFF9800)
+                                PasswordStrength.WEAK -> Color(0xFFF44336)
+                            }
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "Password Strength:",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Text(
+                                    text = validation.strength.name,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = strengthColor
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // Confirm Password
+                        OutlinedTextField(
+                            value = uiState.confirmPassword,
+                            onValueChange = onConfirmPasswordChanged,
+                            label = { Text("Confirm Password") },
+                            singleLine = true,
+                            visualTransformation = if (uiState.isConfirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                            trailingIcon = {
+                                TextButton(onClick = onToggleConfirmPasswordVisibility) {
+                                    Text(
+                                        text = if (uiState.isConfirmPasswordVisible) "Hide" else "Show",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 12.sp,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            },
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Password,
+                                imeAction = ImeAction.Done
+                            ),
+                            keyboardActions = KeyboardActions(
+                                onDone = {
+                                    focusManager.clearFocus()
+                                    onSignupClick()
+                                }
+                            ),
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+                            )
+                        )
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        // Terms & Privacy Checkbox
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onToggleTermsAccepted() }
+                        ) {
+                            Checkbox(
+                                checked = uiState.termsAccepted,
+                                onCheckedChange = { onToggleTermsAccepted() }
+                            )
+                            Text(
+                                text = "I agree to Terms & Privacy Policy",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
-                // Confirm Password
-                OutlinedTextField(
-                    value = uiState.confirmPassword,
-                    onValueChange = onConfirmPasswordChanged,
-                    label = { Text("Confirm Password") },
-                    singleLine = true,
-                    visualTransformation = if (uiState.isConfirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    trailingIcon = {
-                        IconButton(onClick = onToggleConfirmPasswordVisibility) {
-                            Icon(
-                                painter = painterResource(
-                                    id = if (uiState.isConfirmPasswordVisible) R.drawable.ic_save else R.drawable.ic_more
-                                ),
-                                contentDescription = "Toggle password visibility",
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    },
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Password,
-                        imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            focusManager.clearFocus()
-                            onSignupClick()
-                        }
-                    ),
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp)
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // Terms & Privacy Checkbox
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onToggleTermsAccepted() }
-                ) {
-                    Checkbox(
-                        checked = uiState.termsAccepted,
-                        onCheckedChange = { onToggleTermsAccepted() }
-                    )
-                    Text(
-                        text = "I agree to the Terms of Service & Privacy Policy",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Create Account Button
+                // Create Account Primary Button
                 Button(
                     onClick = {
                         focusManager.clearFocus()
@@ -312,22 +363,22 @@ fun SignupScreenCompose(
                 ) {
                     if (uiState.isLoading) {
                         CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
+                            modifier = Modifier.size(22.dp),
                             color = MaterialTheme.colorScheme.onPrimary,
                             strokeWidth = 2.dp
                         )
-                        Spacer(modifier = Modifier.width(12.dp))
+                        Spacer(modifier = Modifier.width(10.dp))
                         Text("Creating Account...")
                     } else {
                         Text(
-                            text = "Create Account",
+                            text = "Create KNotes Account",
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(18.dp))
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -337,14 +388,15 @@ fun SignupScreenCompose(
                     Text(
                         text = "  OR  ",
                         style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.outline
                     )
                     HorizontalDivider(modifier = Modifier.weight(1f))
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(18.dp))
 
-                // Google Sign In
+                // Google Sign In Button
                 OutlinedButton(
                     onClick = onGoogleSignInClick,
                     enabled = !uiState.isLoading,
@@ -362,7 +414,7 @@ fun SignupScreenCompose(
                     Spacer(modifier = Modifier.width(12.dp))
                     Text(
                         text = "Continue with Google",
-                        fontWeight = FontWeight.SemiBold,
+                        fontWeight = FontWeight.Bold,
                         fontSize = 15.sp,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -370,7 +422,7 @@ fun SignupScreenCompose(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Already have an account link
+                // Already Have An Account Link
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
@@ -391,25 +443,5 @@ fun SignupScreenCompose(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun RequirementItem(text: String, isMet: Boolean) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(vertical = 1.dp)
-    ) {
-        Text(
-            text = if (isMet) "✓ " else "• ",
-            color = if (isMet) Color(0xFF4CAF50) else MaterialTheme.colorScheme.outline,
-            fontWeight = FontWeight.Bold,
-            fontSize = 12.sp
-        )
-        Text(
-            text = text,
-            style = MaterialTheme.typography.labelSmall,
-            color = if (isMet) Color(0xFF4CAF50) else MaterialTheme.colorScheme.onSurfaceVariant
-        )
     }
 }
