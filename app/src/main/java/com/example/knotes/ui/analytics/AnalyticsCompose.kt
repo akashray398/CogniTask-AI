@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.knotes.R
 import com.example.knotes.domain.usecase.AchievementBadge
-import com.example.knotes.domain.usecase.DailyActivity
 import com.example.knotes.domain.usecase.ProductivityAnalyticsReport
 
 @Composable
@@ -48,8 +47,9 @@ fun AnalyticsScreenCompose(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .statusBarsPadding()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp, vertical = 24.dp)
+                .padding(horizontal = 20.dp, vertical = 16.dp)
         ) {
             // Top Bar Header
             Row(
@@ -333,7 +333,7 @@ fun AnalyticsScreenCompose(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // 4. Peak Productivity Window
+            // 4. Live Active Window & Peak Productivity Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
@@ -341,39 +341,57 @@ fun AnalyticsScreenCompose(
                     containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
                 )
             ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(42.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
-                        contentAlignment = Alignment.Center
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_ai_assist),
-                            contentDescription = "Peak Performance",
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(22.dp)
-                        )
+                        Box(
+                            modifier = Modifier
+                                .size(42.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_ai_assist),
+                                contentDescription = "Peak Performance",
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(22.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(12.dp))
+
+                        Column {
+                            Text(
+                                text = "HISTORICAL PEAK WINDOW",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Text(
+                                text = "${report.peakWindowLabel} (${report.peakWindowCount} tasks)",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        }
                     }
 
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
-                    Column {
+                    Surface(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f)
+                    ) {
                         Text(
-                            text = "Peak Productivity Window",
-                            style = MaterialTheme.typography.labelSmall,
+                            text = "⏱️ Current Time Window: ${report.activeWindowLabel}",
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                            style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Text(
-                            text = report.peakWindowLabel,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = 11.5.sp
                         )
                     }
                 }
@@ -408,13 +426,13 @@ fun AnalyticsScreenCompose(
 @Composable
 private fun BadgeCard(badge: AchievementBadge) {
     Card(
-        modifier = Modifier.width(140.dp),
+        modifier = Modifier.width(150.dp),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (badge.isUnlocked)
-                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f)
+                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.75f)
             else
-                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
         ),
         border = CardDefaults.outlinedCardBorder(enabled = badge.isUnlocked)
     ) {
@@ -440,7 +458,29 @@ private fun BadgeCard(badge: AchievementBadge) {
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = if (badge.isUnlocked) "Unlocked ✓" else "Locked 🔒",
+                text = badge.description,
+                style = MaterialTheme.typography.labelSmall,
+                fontSize = 10.sp,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            LinearProgressIndicator(
+                progress = { badge.progressRatio },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(4.dp)
+                    .clip(RoundedCornerShape(2.dp)),
+                color = if (badge.isUnlocked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                trackColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = if (badge.isUnlocked) "Unlocked ✓" else badge.progressText,
                 style = MaterialTheme.typography.labelSmall,
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,

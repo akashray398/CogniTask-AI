@@ -18,7 +18,9 @@ data class AchievementBadge(
     val title: String,
     val description: String,
     val icon: String,
-    val isUnlocked: Boolean
+    val isUnlocked: Boolean,
+    val progressText: String,
+    val progressRatio: Float
 )
 
 data class ProductivityAnalyticsReport(
@@ -29,6 +31,7 @@ data class ProductivityAnalyticsReport(
     val heatmapGrid: List<DailyActivity>,
     val peakWindowLabel: String,
     val peakWindowCount: Int,
+    val activeWindowLabel: String,
     val badges: List<AchievementBadge>,
     val currentStreak: Int,
     val highestStreak: Int,
@@ -62,8 +65,11 @@ class GetProductivityAnalyticsUseCase @Inject constructor() {
             val endOfDay = startOfDay + 86400000L - 1L
 
             val completedOnDay = tasks.count { task ->
-                val compTime = task.lastCompletedTime ?: if (task.isCompleted) task.updatedTime else 0L
-                compTime in startOfDay..endOfDay
+                if (!task.isCompleted) false
+                else {
+                    val compTime = task.lastCompletedTime ?: task.updatedTime
+                    compTime in startOfDay..endOfDay
+                }
             }
 
             val totalOnDay = tasks.count { task ->
@@ -108,8 +114,11 @@ class GetProductivityAnalyticsUseCase @Inject constructor() {
             val endOfDay = startOfDay + 86400000L - 1L
 
             val completedOnDay = tasks.count { task ->
-                val compTime = task.lastCompletedTime ?: if (task.isCompleted) task.updatedTime else 0L
-                compTime in startOfDay..endOfDay
+                if (!task.isCompleted) false
+                else {
+                    val compTime = task.lastCompletedTime ?: task.updatedTime
+                    compTime in startOfDay..endOfDay
+                }
             }
 
             val level = when {
@@ -136,15 +145,15 @@ class GetProductivityAnalyticsUseCase @Inject constructor() {
         val weeklyTotal = dailyActivities.sumOf { it.totalTasks }
         val weeklyPercent = if (weeklyTotal > 0) minOf(100, ((weeklyCompleted.toFloat() / weeklyTotal.toFloat()) * 100).toInt()) else 0
 
-        // 4. Calculate Peak Productivity Window of Day
+        // 4. Calculate Peak Productivity Window & Current Live Active Window
         var morningCount = 0
         var afternoonCount = 0
         var eveningCount = 0
         var nightCount = 0
 
-        tasks.forEach { task ->
+        tasks.filter { it.isCompleted }.forEach { task ->
             val time = task.lastCompletedTime ?: task.updatedTime
-            if (task.isCompleted && time > 0L) {
+            if (time > 0L) {
                 val cal = Calendar.getInstance().apply { timeInMillis = time }
                 when (cal.get(Calendar.HOUR_OF_DAY)) {
                     in 5..11 -> morningCount++
@@ -163,14 +172,60 @@ class GetProductivityAnalyticsUseCase @Inject constructor() {
         )
         val peakEntry = windowMap.maxByOrNull { it.value } ?: windowMap.entries.first()
 
-        // 5. Achievement Badges
+        // Determine Live Current Active Window
+        val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        val activeWindowLabel = when (currentHour) {
+            in 5..11 -> "🌅 Morning Focus Window (5 AM - 12 PM)"
+            in 12..16 -> "☀️ Afternoon Focus Window (12 PM - 5 PM)"
+            in 17..21 -> "🌆 Evening Focus Window (5 PM - 10 PM)"
+            else -> "🌙 Night Focus Window (10 PM - 5 AM)"
+        }
+
+        // 5. Achievement Badges with Real Progress
         val totalCompletedAllTime = tasks.count { it.isCompleted }
+        val effectiveStreak = maxOf(currentStreak, highestStreak)
+
         val badges = listOf(
-            AchievementBadge("First Step 🎯", "Completed your first task", "🎯", totalCompletedAllTime >= 1),
-            AchievementBadge("3-Day Spark 🔥", "Maintained a 3-day streak", "🔥", currentStreak >= 3 || highestStreak >= 3),
-            AchievementBadge("Week Warrior 👑", "Reached a 7-day streak", "👑", currentStreak >= 7 || highestStreak >= 7),
-            AchievementBadge("Task Crusher ⚡", "Completed 10+ tasks", "⚡", totalCompletedAllTime >= 10),
-            AchievementBadge("Knowledge Master 🧠", "Created 5+ notes", "🧠", notes.size >= 5)
+            AchievementBadge(
+                title = "First Step 🎯",
+                description = "Complete your first task",
+                icon = "🎯",
+                isUnlocked = totalCompletedAllTime >= 1,
+                progressText = if (totalCompletedAllTime >= 1) "1/1 Done" else "0/1 Done",
+                progressRatio = minOf(1.0f, totalCompletedAllTime.toFloat() / 1.0f)
+            ),
+            AchievementBadge(
+                title = "3-Day Spark 🔥",
+                description = "Maintain a 3-day streak",
+                icon = "🔥",
+                isUnlocked = effectiveStreak >= 3,
+                progressText = "${minOf(effectiveStreak, 3)}/3 Days",
+                progressRatio = minOf(1.0f, effectiveStreak.toFloat() / 3.0f)
+            ),
+            AchievementBadge(
+                title = "Week Warrior 👑",
+                description = "Maintain a 7-day streak",
+                icon = "👑",
+                isUnlocked = effectiveStreak >= 7,
+                progressText = "${minOf(effectiveStreak, 7)}/7 Days",
+                progressRatio = minOf(1.0f, effectiveStreak.toFloat() / 7.0f)
+            ),
+            AchievementBadge(
+                title = "Task Crusher ⚡",
+                description = "Complete 10+ tasks",
+                icon = "⚡",
+                isUnlocked = totalCompletedAllTime >= 10,
+                progressText = "${minOf(totalCompletedAllTime, 10)}/10 Tasks",
+                progressRatio = minOf(1.0f, totalCompletedAllTime.toFloat() / 10.0f)
+            ),
+            AchievementBadge(
+                title = "Knowledge Master 🧠",
+                description = "Create 5+ notes in library",
+                icon = "🧠",
+                isUnlocked = notes.size >= 5,
+                progressText = "${minOf(notes.size, 5)}/5 Notes",
+                progressRatio = minOf(1.0f, notes.size.toFloat() / 5.0f)
+            )
         )
 
         return ProductivityAnalyticsReport(
@@ -181,6 +236,7 @@ class GetProductivityAnalyticsUseCase @Inject constructor() {
             heatmapGrid = heatmapGrid,
             peakWindowLabel = peakEntry.key,
             peakWindowCount = peakEntry.value,
+            activeWindowLabel = activeWindowLabel,
             badges = badges,
             currentStreak = currentStreak,
             highestStreak = highestStreak,
