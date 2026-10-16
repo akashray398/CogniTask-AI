@@ -39,24 +39,9 @@ fun FocusVelocityDigestCompose(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    val focusState by com.example.knotes.service.FocusService.focusTimerState.collectAsState()
     var selectedFocusMinutes by remember { mutableIntStateOf(15) }
-    var isFocusTimerActive by remember { mutableStateOf(false) }
-    var remainingTimerSeconds by remember { mutableIntStateOf(15 * 60) }
-    var isTimerRunning by remember { mutableStateOf(false) }
-    var isTimerCompleted by remember { mutableStateOf(false) }
     var isDurationPickerExpanded by remember { mutableStateOf(false) }
-
-    // Live Ticker for Focus Burst Timer
-    LaunchedEffect(isTimerRunning, remainingTimerSeconds) {
-        if (isTimerRunning && remainingTimerSeconds > 0) {
-            delay(1000L)
-            remainingTimerSeconds--
-        } else if (remainingTimerSeconds == 0 && isTimerRunning) {
-            isTimerRunning = false
-            isTimerCompleted = true
-            com.example.knotes.util.FocusAlarmPlayer.playCalmAlarm(context, 10_000L)
-        }
-    }
 
     // Velocity Score Calculation (0 - 100%)
     val velocityScore = remember(state) {
@@ -272,7 +257,7 @@ fun FocusVelocityDigestCompose(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Focus Burst Timer Section
-            if (isTimerCompleted) {
+            if (focusState.isCompleted) {
                 // Completion Alert View
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
@@ -291,13 +276,13 @@ fun FocusVelocityDigestCompose(
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "Great job! You completed a $selectedFocusMinutes-minute focus session.",
+                            text = "Great job! You completed your focus session.",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
                         )
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
-                            text = "🔔 Calm alarm playing for 10 seconds...",
+                            text = "🔔 Sounding calm meditation chime...",
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
@@ -305,10 +290,7 @@ fun FocusVelocityDigestCompose(
                         Spacer(modifier = Modifier.height(10.dp))
                         Button(
                             onClick = {
-                                com.example.knotes.util.FocusAlarmPlayer.stopAlarm()
-                                isTimerCompleted = false
-                                isFocusTimerActive = false
-                                remainingTimerSeconds = selectedFocusMinutes * 60
+                                com.example.knotes.service.FocusService.dismissCompletion(context)
                             },
                             shape = RoundedCornerShape(12.dp)
                         ) {
@@ -316,7 +298,7 @@ fun FocusVelocityDigestCompose(
                         }
                     }
                 }
-            } else if (!isFocusTimerActive) {
+            } else if (!focusState.isActive) {
                 // Progressive Compact Launcher View
                 Column(
                     modifier = Modifier
@@ -407,11 +389,8 @@ fun FocusVelocityDigestCompose(
                     // Primary Focus Button with Integrated Duration Pill
                     OutlinedButton(
                         onClick = {
-                            remainingTimerSeconds = selectedFocusMinutes * 60
-                            isFocusTimerActive = true
-                            isTimerRunning = true
-                            isTimerCompleted = false
                             isDurationPickerExpanded = false
+                            com.example.knotes.service.FocusService.startFocus(context, selectedFocusMinutes)
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -487,8 +466,8 @@ fun FocusVelocityDigestCompose(
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary
                             )
-                            val minutes = remainingTimerSeconds / 60
-                            val seconds = remainingTimerSeconds % 60
+                            val minutes = focusState.remainingSeconds / 60
+                            val seconds = focusState.remainingSeconds % 60
                             Text(
                                 text = String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds),
                                 style = MaterialTheme.typography.headlineMedium,
@@ -499,18 +478,14 @@ fun FocusVelocityDigestCompose(
 
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             FilledTonalIconButton(
-                                onClick = { isTimerRunning = !isTimerRunning },
+                                onClick = { com.example.knotes.service.FocusService.togglePauseResume(context) },
                                 modifier = Modifier.size(36.dp)
                             ) {
-                                Text(if (isTimerRunning) "⏸" else "▶", fontSize = 14.sp)
+                                Text(if (focusState.isRunning) "⏸" else "▶", fontSize = 14.sp)
                             }
 
                             FilledTonalIconButton(
-                                onClick = {
-                                    isTimerRunning = false
-                                    isFocusTimerActive = false
-                                    remainingTimerSeconds = selectedFocusMinutes * 60
-                                },
+                                onClick = { com.example.knotes.service.FocusService.stopFocus(context) },
                                 modifier = Modifier.size(36.dp)
                             ) {
                                 Text("✕", fontSize = 14.sp)
