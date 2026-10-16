@@ -81,6 +81,26 @@ class MainActivity : AppCompatActivity() {
         navController = navHostFragment.navController
         
         binding.bottomNavigation.setupWithNavController(navController)
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.editTaskFragment,
+                R.id.editNoteFragment,
+                R.id.noteDetailFragment,
+                R.id.analyticsFragment,
+                R.id.loginFragment,
+                R.id.signupFragment,
+                R.id.emailVerificationFragment,
+                R.id.aiChatFragment,
+                R.id.versionHistoryFragment -> {
+                    binding.bottomNavigation.visibility = android.view.View.GONE
+                }
+                else -> {
+                    binding.bottomNavigation.visibility = android.view.View.VISIBLE
+                }
+            }
+        }
+
         setupNavHeader()
         setupDrawerNavigation()
 
