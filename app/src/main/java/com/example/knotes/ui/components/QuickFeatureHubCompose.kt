@@ -161,7 +161,7 @@ fun QuickFeatureHubBottomSheet(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Enable Gemini & Groq AI",
+                                text = "Enable Gemini AI",
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.SemiBold
                             )
