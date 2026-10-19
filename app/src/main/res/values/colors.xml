@@ -43,8 +43,14 @@
     <color name="card_stroke_color">#1A000000</color>
 
     <!-- Splash Screen Colors -->
-    <color name="splash_background">#0D0B14</color>
+    <color name="splash_background">#0F172A</color>
     <color name="splash_purple_glow">#4D6750A4</color>
     <color name="purple_6750A4">#6750A4</color>
     <color name="purple_D0BCFF">#D0BCFF</color>
+
+    <!-- CogniTask AI Brand Colors -->
+    <color name="deep_navy">#0F172A</color>
+    <color name="electric_blue">#2563EB</color>
+    <color name="violet_primary">#6750A4</color>
+    <color name="cyan_accent">#06B6D4</color>
 </resources>

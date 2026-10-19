@@ -88,20 +88,8 @@ fun NotesTopBarCompose(
                             )
                     )
 
-                    // Vibrant Brand Logo Badge
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(RoundedCornerShape(14.dp))
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_splash_logo),
-                            contentDescription = "Notes Logo",
-                            modifier = Modifier.fillMaxSize(),
-                            tint = Color.Unspecified
-                        )
-                    }
+                    // Vibrant Typographic CogniTask AI Logo Badge
+                    CogniTaskLogoCompose(isLarge = false)
                 }
 
                 Spacer(modifier = Modifier.width(12.dp))

@@ -5,22 +5,30 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Stylized CogniTask 'C' Crescent Arc inside 66dp adaptive safe zone -->
+    <!-- Big Pure White 'C' Crescent Arc (Cogni) - Centered in 66dp Safe Zone -->
     <path
-        android:pathData="M72,34 A24,24 0 1,0 72,74"
-        android:strokeWidth="10"
+        android:pathData="M64,38 A18,18 0 1,0 64,74"
+        android:strokeWidth="9.5"
         android:strokeColor="#FFFFFF"
         android:strokeLineCap="round"
         android:strokeLineJoin="round" />
 
-    <!-- Gold Core Node -->
+    <!-- Small Gold Superscript 'T' Bar & Stem (Task) - Safe inside Safe Zone -->
     <path
-        android:pathData="M54,54 A6,6 0 1,1 42,54 A6,6 0 1,1 54,54"
+        android:pathData="M64,32 H80 M72,32 V46"
+        android:strokeWidth="4.5"
+        android:strokeColor="#FFD54F"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <!-- Accent Gold Node Dot -->
+    <path
+        android:pathData="M81.5,52 A3.5,3.5 0 1,1 74.5,52 A3.5,3.5 0 1,1 81.5,52"
         android:fillColor="#FFD54F" />
 
-    <!-- Cyan Quantum Sparkle Star -->
+    <!-- Cyan Quantum Sparkle Star (Top Right Safe Position) -->
     <path
-        android:pathData="M70,34 L72.5,27 L75,34 L82,36.5 L75,39 L72.5,46 L70,39 L63,36.5 Z"
+        android:pathData="M80,24 L81.5,20 L83,24 L87,25.5 L83,27 L81.5,31 L80,27 L76,25.5 Z"
         android:fillColor="#80DEEA" />
 
 </vector>

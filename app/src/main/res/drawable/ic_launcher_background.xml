@@ -6,7 +6,7 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Premium KNotes Rounded Squircle Base Shape (Safe across all Android Launchers) -->
+    <!-- Executive Midnight Indigo to Royal Purple Squircle Base -->
     <path
         android:pathData="M24,8 H84 C96,8 102,14 102,26 V82 C102,94 96,100 84,100 H24 C12,100 6,94 6,82 V26 C6,14 12,8 24,8 Z">
         <aapt:attr name="android:fillColor">
@@ -16,14 +16,14 @@
                 android:startX="6"
                 android:startY="8"
                 android:type="linear">
-                <item android:color="#7D5260" android:offset="0.0" />
-                <item android:color="#6750A4" android:offset="0.5" />
-                <item android:color="#381E72" android:offset="1.0" />
+                <item android:color="#1E1B4B" android:offset="0.0" />
+                <item android:color="#4338CA" android:offset="0.5" />
+                <item android:color="#6366F1" android:offset="1.0" />
             </gradient>
         </aapt:attr>
     </path>
 
-    <!-- Glassmorphism Reflection Accent Overlay -->
+    <!-- Glassmorphism Soft Reflection Overlay -->
     <path
         android:pathData="M24,8 H84 C96,8 102,14 102,26 V54 L48,100 H24 C12,100 6,94 6,82 V26 C6,14 12,8 24,8 Z"
         android:fillColor="#FFFFFF"

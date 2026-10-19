@@ -92,20 +92,11 @@ fun SplashScreenCompose() {
             verticalArrangement = Arrangement.Center,
             modifier = Modifier.padding(24.dp)
         ) {
-            // Elastic Radiant Logo Badge
-            Box(
-                modifier = Modifier
-                    .size(120.dp)
-                    .scale(logoScale.value),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_splash_logo),
-                    contentDescription = "KNotes Logo",
-                    modifier = Modifier.size(120.dp),
-                    tint = Color.Unspecified
-                )
-            }
+            // Animated Typographic CogniTask AI Logo Badge
+            com.example.knotes.ui.components.CogniTaskLogoCompose(
+                isLarge = true,
+                modifier = Modifier.scale(logoScale.value)
+            )
 
             Spacer(modifier = Modifier.height(28.dp))
 

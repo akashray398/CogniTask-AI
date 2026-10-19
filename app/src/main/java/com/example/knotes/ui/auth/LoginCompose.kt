@@ -120,20 +120,8 @@ fun LoginScreenCompose(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                // Vibrant Brand Emblem
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .size(72.dp)
-                        .clip(RoundedCornerShape(22.dp))
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_splash_logo),
-                        contentDescription = "KNotes Logo",
-                        modifier = Modifier.fillMaxSize(),
-                        tint = Color.Unspecified
-                    )
-                }
+                // Vibrant Typographic CogniTask AI Logo
+                com.example.knotes.ui.components.CogniTaskLogoCompose(isLarge = true)
 
                 Spacer(modifier = Modifier.height(18.dp))
 

@@ -89,20 +89,8 @@ fun NavHeaderCompose(
                             )
                     )
 
-                    // Vibrant Brand Logo Badge
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .size(44.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_splash_logo),
-                            contentDescription = "KNotes Logo",
-                            modifier = Modifier.fillMaxSize(),
-                            tint = Color.Unspecified
-                        )
-                    }
+                    // Vibrant Typographic CogniTask AI Logo Badge
+                    CogniTaskLogoCompose(isLarge = false)
                 }
 
                 // Streak Pill

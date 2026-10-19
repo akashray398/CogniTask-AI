@@ -6,7 +6,7 @@
     android:viewportWidth="120"
     android:viewportHeight="120">
 
-    <!-- Glowing Radiant Gradient Background Base -->
+    <!-- Executive Midnight Indigo to Royal Purple Gradient Base -->
     <path
         android:pathData="M30,10 H90 C101,10 110,19 110,30 V90 C110,101 101,110 90,110 H30 C19,110 10,101 10,90 V30 C10,19 19,10 30,10 Z">
         <aapt:attr name="android:fillColor">
@@ -16,35 +16,43 @@
                 android:startX="10"
                 android:startY="10"
                 android:type="linear">
-                <item android:color="#7D5260" android:offset="0.0" />
-                <item android:color="#6750A4" android:offset="0.5" />
-                <item android:color="#381E72" android:offset="1.0" />
+                <item android:color="#1E1B4B" android:offset="0.0" />
+                <item android:color="#4338CA" android:offset="0.5" />
+                <item android:color="#6366F1" android:offset="1.0" />
             </gradient>
         </aapt:attr>
     </path>
 
-    <!-- Inner Glassmorphism Reflection -->
+    <!-- Inner Glassmorphism Reflection Overlay -->
     <path
         android:pathData="M30,10 H90 C101,10 110,19 110,30 V60 L50,110 H30 C19,110 10,101 10,90 V30 C10,19 19,10 30,10 Z"
         android:fillColor="#FFFFFF"
         android:fillAlpha="0.12" />
 
-    <!-- Pure White Futuristic CogniTask 'C' Outer Crescent Arc -->
+    <!-- Big Pure White 'C' Crescent Arc (Cogni) -->
     <path
-        android:pathData="M80,38 A28,28 0 1,0 80,82"
-        android:strokeWidth="11"
+        android:pathData="M70,42 A20,20 0 1,0 70,82"
+        android:strokeWidth="10.5"
         android:strokeColor="#FFFFFF"
         android:strokeLineCap="round"
         android:strokeLineJoin="round" />
 
-    <!-- Radiant Gold Core Node Ball -->
+    <!-- Small Gold Superscript 'T' Bar & Stem (Task) -->
     <path
-        android:pathData="M60,60 A7,7 0 1,1 46,60 A7,7 0 1,1 60,60"
+        android:pathData="M70,36 H88 M79,36 V52"
+        android:strokeWidth="5"
+        android:strokeColor="#FFD54F"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <!-- Accent Gold Node Dot -->
+    <path
+        android:pathData="M90,58 A4,4 0 1,1 82,58 A4,4 0 1,1 90,58"
         android:fillColor="#FFD54F" />
 
-    <!-- Futuristic Cyan Quantum Sparkle Star -->
+    <!-- Cyan Quantum Sparkle Star -->
     <path
-        android:pathData="M78,38 L81,30 L84,38 L92,41 L84,44 L81,52 L78,44 L70,41 Z"
+        android:pathData="M88,27 L89.5,22.5 L91,27 L95.5,28.5 L91,30 L89.5,34.5 L88,30 L83.5,28.5 Z"
         android:fillColor="#80DEEA" />
 
 </vector>
