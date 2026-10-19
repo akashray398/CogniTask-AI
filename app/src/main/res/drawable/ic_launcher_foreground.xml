@@ -5,35 +5,22 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Stylized KNotes 'K' inside 66dp adaptive safe zone (viewport 108x108) -->
-    <!-- Vertical stem -->
+    <!-- Stylized CogniTask 'C' Crescent Arc inside 66dp adaptive safe zone -->
     <path
-        android:pathData="M38,30 V78"
+        android:pathData="M72,34 A24,24 0 1,0 72,74"
         android:strokeWidth="10"
         android:strokeColor="#FFFFFF"
-        android:strokeLineCap="round" />
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
 
-    <!-- Top arm -->
+    <!-- Gold Core Node -->
     <path
-        android:pathData="M38,54 L72,30"
-        android:strokeWidth="10"
-        android:strokeColor="#FFFFFF"
-        android:strokeLineCap="round" />
-
-    <!-- Bottom arm -->
-    <path
-        android:pathData="M41,54 L75,78"
-        android:strokeWidth="10"
-        android:strokeColor="#FFFFFF"
-        android:strokeLineCap="round" />
-
-    <!-- Gold Sparkle Accent Ball -->
-    <path
-        android:pathData="M84,58 A5.5,5.5 0 1,1 73,58 A5.5,5.5 0 1,1 84,58"
+        android:pathData="M54,54 A6,6 0 1,1 42,54 A6,6 0 1,1 54,54"
         android:fillColor="#FFD54F" />
 
-    <!-- Teal Magic Star Sparkle -->
+    <!-- Cyan Quantum Sparkle Star -->
     <path
-        android:pathData="M76,32 L78,27 L80,32 L85,34 L80,36 L78,41 L76,36 L71,34 Z"
+        android:pathData="M70,34 L72.5,27 L75,34 L82,36.5 L75,39 L72.5,46 L70,39 L63,36.5 Z"
         android:fillColor="#80DEEA" />
+
 </vector>

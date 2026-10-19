@@ -126,7 +126,7 @@ fun SplashScreenCompose() {
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Capture Ideas. Organize Life.",
+                    text = "Smart Knowledge & Task Workspace",
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
                     fontSize = 15.sp,

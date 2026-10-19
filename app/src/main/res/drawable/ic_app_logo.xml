@@ -1,54 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:aapt="http://schemas.android.com/aapt"
     android:width="120dp"
     android:height="120dp"
     android:viewportWidth="120"
     android:viewportHeight="120">
-    
-    <!-- Sophisticated Gradient Background Shape -->
+
+    <!-- Glowing Radiant Gradient Background Base -->
     <path
-        android:pathData="M30,20 H90 C100,20 110,30 110,40 V80 C110,100 90,110 70,110 H30 C15,110 10,95 10,80 V40 C10,25 15,20 30,20 Z">
+        android:pathData="M30,10 H90 C101,10 110,19 110,30 V90 C110,101 101,110 90,110 H30 C19,110 10,101 10,90 V30 C10,19 19,10 30,10 Z">
         <aapt:attr name="android:fillColor">
             <gradient
                 android:endX="110"
                 android:endY="110"
                 android:startX="10"
-                android:startY="20"
+                android:startY="10"
                 android:type="linear">
-                <item android:color="#FF6200EE" android:offset="0.0"/>
-                <item android:color="#FF3700B3" android:offset="1.0"/>
+                <item android:color="#7D5260" android:offset="0.0" />
+                <item android:color="#6750A4" android:offset="0.5" />
+                <item android:color="#381E72" android:offset="1.0" />
             </gradient>
         </aapt:attr>
     </path>
 
-    <!-- Glassmorphism-style Accent -->
+    <!-- Inner Glassmorphism Reflection -->
     <path
-        android:pathData="M80,20 C95,20 110,35 110,50 L50,110 C35,110 20,95 20,80 Z"
-        android:fillAlpha="0.15"
-        android:fillColor="#FFFFFF"/>
+        android:pathData="M30,10 H90 C101,10 110,19 110,30 V60 L50,110 H30 C19,110 10,101 10,90 V30 C10,19 19,10 30,10 Z"
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.12" />
 
-    <!-- Unique Stylized 'K' -->
+    <!-- Pure White Futuristic CogniTask 'C' Outer Crescent Arc -->
     <path
-        android:pathData="M42,40 V82"
-        android:strokeWidth="10"
+        android:pathData="M80,38 A28,28 0 1,0 80,82"
+        android:strokeWidth="11"
         android:strokeColor="#FFFFFF"
-        android:strokeLineCap="round"/>
-    
-    <path
-        android:pathData="M42,61 L75,40"
-        android:strokeWidth="10"
-        android:strokeColor="#FFFFFF"
-        android:strokeLineCap="round"/>
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
 
+    <!-- Radiant Gold Core Node Ball -->
     <path
-        android:pathData="M45,61 L78,82"
-        android:strokeWidth="10"
-        android:strokeColor="#FFFFFF"
-        android:strokeLineCap="round"/>
+        android:pathData="M60,60 A7,7 0 1,1 46,60 A7,7 0 1,1 60,60"
+        android:fillColor="#FFD54F" />
 
-    <!-- Dynamic Sparkle/Dot -->
+    <!-- Futuristic Cyan Quantum Sparkle Star -->
     <path
-        android:pathData="M85,65 A6,6 0 1,1 73,65 A6,6 0 1,1 85,65"
-        android:fillColor="#03DAC6"/>
+        android:pathData="M78,38 L81,30 L84,38 L92,41 L84,44 L81,52 L78,44 L70,41 Z"
+        android:fillColor="#80DEEA" />
 
 </vector>

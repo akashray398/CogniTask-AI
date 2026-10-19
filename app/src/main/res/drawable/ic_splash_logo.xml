@@ -6,7 +6,7 @@
     android:viewportWidth="120"
     android:viewportHeight="120">
 
-    <!-- Glowing Radiant Gradient Background -->
+    <!-- Glowing Radiant Gradient Background Base -->
     <path
         android:pathData="M30,10 H90 C101,10 110,19 110,30 V90 C110,101 101,110 90,110 H30 C19,110 10,101 10,90 V30 C10,19 19,10 30,10 Z">
         <aapt:attr name="android:fillColor">
@@ -23,42 +23,28 @@
         </aapt:attr>
     </path>
 
-    <!-- Inner Soft Glass Reflection -->
+    <!-- Inner Glassmorphism Reflection -->
     <path
         android:pathData="M30,10 H90 C101,10 110,19 110,30 V60 L50,110 H30 C19,110 10,101 10,90 V30 C10,19 19,10 30,10 Z"
         android:fillColor="#FFFFFF"
         android:fillAlpha="0.12" />
 
-    <!-- Pure White Bold Stylized 'K' Stem & Arms -->
-    <!-- Vertical stem -->
+    <!-- Pure White Futuristic CogniTask 'C' Outer Crescent Arc -->
     <path
-        android:pathData="M42,34 V86"
+        android:pathData="M80,38 A28,28 0 1,0 80,82"
         android:strokeWidth="11"
         android:strokeColor="#FFFFFF"
-        android:strokeLineCap="round" />
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
 
-    <!-- Top arm -->
+    <!-- Radiant Gold Core Node Ball -->
     <path
-        android:pathData="M42,60 L78,34"
-        android:strokeWidth="11"
-        android:strokeColor="#FFFFFF"
-        android:strokeLineCap="round" />
-
-    <!-- Bottom arm -->
-    <path
-        android:pathData="M46,60 L82,86"
-        android:strokeWidth="11"
-        android:strokeColor="#FFFFFF"
-        android:strokeLineCap="round" />
-
-    <!-- Vibrant Gold Sparkle Ball -->
-    <path
-        android:pathData="M92,64 A6,6 0 1,1 80,64 A6,6 0 1,1 92,64"
+        android:pathData="M60,60 A7,7 0 1,1 46,60 A7,7 0 1,1 60,60"
         android:fillColor="#FFD54F" />
 
-    <!-- Teal Magic Star Sparkle -->
+    <!-- Futuristic Cyan Quantum Sparkle Star -->
     <path
-        android:pathData="M84,36 L86.5,30 L89,36 L93,38.5 L89,41 L86.5,47 L84,41 L78,38.5 Z"
+        android:pathData="M78,38 L81,30 L84,38 L92,41 L84,44 L81,52 L78,44 L70,41 Z"
         android:fillColor="#80DEEA" />
 
 </vector>

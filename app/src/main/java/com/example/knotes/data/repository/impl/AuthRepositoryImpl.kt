@@ -72,7 +72,7 @@ class AuthRepositoryImpl @Inject constructor(
         return UserProfile(
             uid = uid,
             email = email ?: "",
-            displayName = displayName ?: email?.substringBefore("@") ?: "KNotes User",
+            displayName = displayName ?: email?.substringBefore("@") ?: "CogniTask User",
             isEmailVerified = isEmailVerified || isProviderGoogle(this),
             photoUrl = photoUrl?.toString()
         )

@@ -134,7 +134,7 @@ class MainActivity : AppCompatActivity() {
             setContent {
                 val user = auth?.currentUser
                 val isSignedIn = user != null
-                val displayName = user?.displayName ?: if (isSignedIn) "KNotes Member" else "KNotes Guest"
+                val displayName = user?.displayName ?: if (isSignedIn) "CogniTask Member" else "CogniTask Guest"
                 val email = user?.email ?: ""
                 val streak by settingsManager.currentStreak.collectAsState(initial = 0)
 
