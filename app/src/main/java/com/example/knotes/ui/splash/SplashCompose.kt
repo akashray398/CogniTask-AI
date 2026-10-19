@@ -115,7 +115,7 @@ fun SplashScreenCompose() {
                 modifier = Modifier.scale(textAlpha.value)
             ) {
                 Text(
-                    text = "KNotes",
+                    text = "CogniTask AI",
                     style = MaterialTheme.typography.headlineLarge,
                     fontWeight = FontWeight.Black,
                     fontSize = 36.sp,

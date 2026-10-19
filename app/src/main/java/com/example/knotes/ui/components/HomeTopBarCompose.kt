@@ -125,7 +125,7 @@ fun HomeTopBarCompose(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "KNotes",
+                            text = "CogniTask AI",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Black,
                             fontSize = 22.sp,

@@ -1,4 +1,4 @@
-# 🚀 KNotes: AI-Powered Productivity Suite
+# 🚀 CogniTask AI: Offline-First AI Knowledge & Task Execution Platform
 
 <div align="center">
 
@@ -9,17 +9,38 @@
 [![Firebase Sync](https://img.shields.io/badge/Firebase-Auth%20%2B%20Firestore-FFCA28.svg?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com)
 [![Platform](https://img.shields.io/badge/Platform-Android%208.0%2B%20%28API%2026%2B%29-3DDC84.svg?style=for-the-badge&logo=android&logoColor=white)](https://www.android.com)
 
-### ✨ Capture Ideas • Manage Tasks • Track Habits • Unleash AI Intelligence
+### ✨ Capture Ideas • Execute Tasks • Track Habit Velocity • Unleash Dual AI Intelligence
 
 </div>
 
 ---
 
-## 📖 About KNotes
+## 📖 About CogniTask AI
 
-**KNotes** is a modern, offline-first personal knowledge management and productivity application for Android. Engineered with **Kotlin**, **Jetpack Compose Material 3**, and **Clean Architecture**, KNotes seamlessly combines note-taking, task scheduling, finger/stylus canvas drawing, 30-day habit analytics, and AI assistance into a single unified workspace.
+**CogniTask AI** is an enterprise-grade, offline-first personal knowledge management and productivity application engineered for Android. Built with pure **Kotlin**, **Jetpack Compose Material 3**, and **Clean Architecture**, CogniTask AI seamlessly combines markdown note-taking, task scheduling, finger/stylus canvas drawing, 30-day habit analytics, and AI assistance into a single unified workspace.
 
-Whether you're taking markdown notes, drawing handwritten diagrams, setting recurring task deadlines, or tracking your productivity velocity, KNotes provides a fast, secure, and beautiful user experience with instant local persistence and automatic cloud synchronization.
+Whether taking markdown notes, drawing handwritten diagrams, setting recurring task deadlines, or tracking productivity velocity, CogniTask AI provides a fast, secure, and beautiful user experience with instant local persistence and automatic cloud synchronization.
+
+---
+
+## 🌟 Resume & Portfolio Showcase Bullets (Copy for Resume / LinkedIn)
+
+If showcasing **CogniTask AI** on your resume or portfolio, use these FAANG/Unicorn-grade action bullets:
+
+- 🚀 **Clean Architecture & Offline-First Sync**:
+  > *"Engineered CogniTask AI, an offline-first Android productivity suite using **Clean Architecture (MVVM + Hilt DI)** and **Room DB (v12)** with explicit schema migrations; built a bidirectional sync engine with Cloud Firestore delivering **0ms UI latency**."*
+
+- ⏱️ **Foreground Service & Audio Signal Synthesis**:
+  > *"Built an Android 14/15 **Foreground Service (`FocusService`)** with a lock-screen notification controller; synthesized a 528Hz Solfeggio harmonic audio wave via **Android AudioTrack PCM stream** for zero-latency meditation timer alerts."*
+
+- 🤖 **Multimodal AI Integration**:
+  > *"Implemented a dual AI pipeline using **Google Gemini 1.5 Flash Vision SDK** for real-time document OCR analysis, automated task extraction, and note summarization."*
+
+- 🔒 **Security & Session Isolation**:
+  > *"Secured user sessions with **AndroidX Biometric Authentication** and **EncryptedSharedPreferences**; designed strict Firestore security rules enforcing complete multi-tenant user data isolation."*
+
+- 🎨 **Declarative Jetpack Compose UI**:
+  > *"Designed an adaptive Material 3 UI using **Jetpack Compose** with custom Canvas touch gesture tracking for stylus drawing, spring physics animations, and edge-to-edge window inset handling across API 26–35."*
 
 ---
 
@@ -77,18 +98,6 @@ graph TD
     end
 ```
 
-### 🔄 Offline-First Cloud Synchronization Flow
-
-```mermaid
-flowchart LR
-    A["✏️ User Edits Note / Task"] --> B["💾 Local Room DB (v12)"]
-    B --> C["⚡ StateFlow Emits to UI (0ms Latency)"]
-    B --> D{"🌐 Network Connected?"}
-    D -- Yes --> E["☁️ Push to Firebase Firestore"]
-    D -- No --> F["⏳ Queue WorkManager Background Sync"]
-    F --> |On Network Restored| E
-```
-
 ---
 
 ## 🛠️ Tech Stack Matrix
@@ -104,17 +113,6 @@ flowchart LR
 | **AI Intelligence** | Google Gemini 1.5 Flash SDK | Summarization, Vision OCR, Auto-tagging, Q&A |
 | **Security** | AndroidX Biometric + Crypto | Hardware fingerprint/face lock & EncryptedPrefs |
 | **Background Tasks** | WorkManager & AlarmManager | Exact alarms, recurring reminders, boot restoration |
-
----
-
-## 🗄️ Database Schema & Room Migrations
-
-KNotes operates on an offline-first **Room Database (Version 12)**:
-
-| Migration | Key Modifications Introduced |
-| :--- | :--- |
-| **`MIGRATION_10_11`** | Added `recurrenceEndDate` (`INTEGER`) column to `tasks` table for date range repeats. |
-| **`MIGRATION_11_12`** | Added `lastCompletedTime` (`INTEGER`) column to `tasks` table for progress synchronization. |
 
 ---
 
