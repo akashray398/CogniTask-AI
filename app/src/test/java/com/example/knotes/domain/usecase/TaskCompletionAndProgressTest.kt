@@ -22,6 +22,7 @@ import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TaskCompletionAndProgressTest {
@@ -80,10 +81,27 @@ class TaskCompletionAndProgressTest {
 
     @Test
     fun `TEST 3 - Progress calculation formula returns correct percentage`() = runBlocking {
+        val now = System.currentTimeMillis()
+        val mockTasks = listOf(
+            Task(id = 1, title = "Task 1", isCompleted = true, lastCompletedTime = now, updatedTime = now, deadline = now),
+            Task(id = 2, title = "Task 2", isCompleted = true, lastCompletedTime = now, updatedTime = now, deadline = now),
+            Task(id = 3, title = "Task 3", isCompleted = false, deadline = now),
+            Task(id = 4, title = "Task 4", isCompleted = false, deadline = now),
+            Task(id = 5, title = "Task 5", isCompleted = false, deadline = now)
+        )
+        `when`(taskRepository.getAllTasks()).thenReturn(flowOf(mockTasks))
+
+        val progressViewModel = TasksViewModel(
+            repository = taskRepository,
+            toggleTaskCompletionUseCase = toggleTaskCompletionUseCase,
+            taskReminderManager = taskReminderManager,
+            streakManager = streakManager
+        )
+
         testDispatcher.scheduler.advanceUntilIdle()
 
         // 2 completed out of 5 total = 40%
-        val stats = viewModel.productivityStats.value
+        val stats = progressViewModel.productivityStats.value
         val completed = stats.first
         val pending = stats.second
         val percentage = stats.third
@@ -97,6 +115,7 @@ class TaskCompletionAndProgressTest {
     fun `TEST 4 - Zero tasks returns 0 percentage without division by zero`() = runBlocking {
         `when`(taskRepository.getCompletedTasksCount()).thenReturn(flowOf(0))
         `when`(taskRepository.getPendingTasksCount()).thenReturn(flowOf(0))
+        `when`(taskRepository.getAllTasks()).thenReturn(flowOf(emptyList()))
 
         val zeroViewModel = TasksViewModel(
             repository = taskRepository,
@@ -120,7 +139,7 @@ class TaskCompletionAndProgressTest {
         viewModel.toggleTaskCompletion(task)
         testDispatcher.scheduler.advanceUntilIdle()
 
-        verify(taskRepository).updateTaskCompletion(55, true)
+        verify(taskRepository).updateTask(any())
         verify(taskReminderManager).cancelTaskReminders(task)
     }
 
@@ -134,7 +153,7 @@ class TaskCompletionAndProgressTest {
 
         testDispatcher.scheduler.advanceUntilIdle()
 
-        // updateTaskCompletion should only be invoked once
-        verify(taskRepository).updateTaskCompletion(77, true)
+        // updateTask should only be invoked once
+        verify(taskRepository).updateTask(any())
     }
 }

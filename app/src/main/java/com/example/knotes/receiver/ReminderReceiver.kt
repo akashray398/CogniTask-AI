@@ -66,7 +66,6 @@ class ReminderReceiver : BroadcastReceiver() {
     private suspend fun handleTaskReminder(context: Context, intent: Intent) {
         val taskId = intent.getIntExtra("taskId", 0)
         val reminderType = intent.getIntExtra("reminderType", 1)
-        val scheduledTime = intent.getLongExtra("scheduledTime", 0L)
 
         if (taskId == 0) return
 
@@ -105,30 +104,6 @@ class ReminderReceiver : BroadcastReceiver() {
             taskId = taskId
         )
         Log.d(TAG, "REMINDER_DELIVERED taskId=$taskId notificationId=$notificationId")
-
-        // Handle Recurrence
-        val entityRecurrence = com.example.knotes.data.entity.Recurrence.valueOf(task.recurrence.name)
-        if (entityRecurrence != com.example.knotes.data.entity.Recurrence.NONE) {
-            val nextTime = RecurrenceHelper.getNextOccurrence(
-                task.reminderTime ?: scheduledTime,
-                entityRecurrence,
-                task.recurrenceEndDate
-            )
-            val nextDeadline = RecurrenceHelper.getNextOccurrence(
-                task.deadline,
-                entityRecurrence,
-                task.recurrenceEndDate
-            )
-            if (nextTime != null || nextDeadline != null) {
-                val updatedTask = task.copy(
-                    reminderTime = nextTime,
-                    deadline = nextDeadline ?: task.deadline
-                )
-                taskRepository.updateTask(updatedTask)
-                taskReminderManager.scheduleTaskReminders(updatedTask)
-                Log.d(TAG, "REMINDER_RESCHEDULED taskId=$taskId nextOccurrence=$nextTime")
-            }
-        }
     }
 
     private suspend fun handleNoteReminder(context: Context, intent: Intent) {
@@ -176,7 +151,48 @@ class ReminderReceiver : BroadcastReceiver() {
         val taskId = intent.getIntExtra("taskId", 0)
         val notificationId = intent.getIntExtra("notificationId", 0)
         if (taskId != 0) {
-            taskRepository.updateTaskCompletion(taskId, true)
+            val task = taskRepository.getTaskById(taskId)
+            if (task != null) {
+                val entityRecurrence = com.example.knotes.data.entity.Recurrence.valueOf(task.recurrence.name)
+                if (entityRecurrence != com.example.knotes.data.entity.Recurrence.NONE) {
+                    val now = System.currentTimeMillis()
+                    val nextReminder = RecurrenceHelper.getNextOccurrence(
+                        task.reminderTime ?: task.deadline,
+                        entityRecurrence,
+                        task.recurrenceEndDate
+                    )
+                    val nextDeadline = RecurrenceHelper.getNextOccurrence(
+                        task.deadline,
+                        entityRecurrence,
+                        task.recurrenceEndDate
+                    )
+
+                    if (nextDeadline != null || nextReminder != null) {
+                        val updatedTask = task.copy(
+                            reminderTime = nextReminder,
+                            deadline = nextDeadline ?: task.deadline,
+                            isCompleted = false,
+                            lastCompletedTime = now,
+                            updatedTime = now
+                        )
+                        taskRepository.updateTask(updatedTask)
+                        taskReminderManager.cancelTaskReminders(task)
+                        taskReminderManager.scheduleTaskReminders(updatedTask)
+                    } else {
+                        val updatedTask = task.copy(
+                            isCompleted = true,
+                            recurrence = com.example.knotes.domain.model.Recurrence.NONE,
+                            lastCompletedTime = now,
+                            updatedTime = now
+                        )
+                        taskRepository.updateTask(updatedTask)
+                        taskReminderManager.cancelTaskReminders(task)
+                    }
+                } else {
+                    taskRepository.updateTaskCompletion(taskId, true)
+                    taskReminderManager.cancelTaskReminders(task)
+                }
+            }
             if (notificationId != 0) {
                 val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
                 nm.cancel(notificationId)
