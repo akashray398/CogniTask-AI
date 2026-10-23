@@ -2,8 +2,28 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_delete"
-        android:icon="@android:drawable/ic_menu_delete"
-        android:title="Delete"
+        android:id="@+id/action_pin"
+        android:icon="@drawable/ic_pin"
+        android:title="@string/action_pin"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_favorite"
+        android:icon="@drawable/ic_favorite"
+        android:title="@string/action_favorite"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_share"
+        android:icon="@drawable/ic_share"
+        android:title="@string/action_share"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_history"
+        android:icon="@drawable/ic_history"
+        android:title="@string/action_history"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_delete"
+        android:icon="@drawable/ic_delete"
+        android:title="@string/action_delete"
+        app:showAsAction="never" />
 </menu>

@@ -49,4 +49,18 @@
     <string name="desc_filter_and_sort">Filter and Sort</string>
     <string name="desc_add_new_task">Add new task</string>
     <string name="default_web_client_id_fallback">1000000000000-dummywebclientid.apps.googleusercontent.com</string>
+
+    <string name="action_pin">Pin Note</string>
+    <string name="action_unpin">Unpin Note</string>
+    <string name="action_favorite">Favorite Note</string>
+    <string name="action_unfavorite">Remove Favorite</string>
+    <string name="action_share">Share</string>
+    <string name="action_history">Version History</string>
+    <string name="action_delete">Delete Note</string>
+    <string name="desc_clock">Clock</string>
+    <string name="desc_reminder">Reminder</string>
+    <string name="edit">Edit</string>
+    <string name="updated_at">Updated %1$s</string>
+    <string name="tag_format">#%1$s</string>
+    <string name="untitled_note">Untitled Note</string>
 </resources>
