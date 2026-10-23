@@ -62,10 +62,10 @@ class TasksFragment : Fragment() {
         setupRecyclerViews()
         setupFab()
         setupSearch()
+        setupTasksTopBar()
         setupTasksHeader()
         setupLinkedNoteSheet()
         setupFilters()
-        setupToolbarActions()
         setupSwipeActions()
         setupPullToRefresh()
         observeViewModel()
@@ -88,6 +88,22 @@ class TasksFragment : Fragment() {
     ) { isGranted: Boolean ->
         if (!isGranted) {
             Toast.makeText(requireContext(), "Reminders might not work without notification permission", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun setupTasksTopBar() {
+        binding.composeTasksTopBar.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val stats by viewModel.productivityStats.collectAsState(initial = Triple(0, 0, 0))
+
+                com.example.knotes.ui.components.TasksTopBarCompose(
+                    pendingCount = stats.second,
+                    completedCount = stats.first,
+                    onFilterClick = { showSortMenu() },
+                    onAiChatClick = { findNavController().navigate(R.id.aiChatFragment) }
+                )
+            }
         }
     }
 
@@ -261,12 +277,8 @@ class TasksFragment : Fragment() {
         }
     }
 
-    private fun setupToolbarActions() {
-        binding.btnFilterMenu.setOnClickListener { showSortMenu() }
-    }
-
     private fun showSortMenu() {
-        val popup = PopupMenu(requireContext(), binding.btnFilterMenu)
+        val popup = PopupMenu(requireContext(), binding.composeTasksTopBar)
         popup.menuInflater.inflate(R.menu.menu_task_sort, popup.menu)
         popup.setOnMenuItemClickListener { item ->
             val order = when (item.itemId) {
@@ -325,14 +337,6 @@ class TasksFragment : Fragment() {
                         binding.layoutCompletedHeader.visibility = if (completedTasks.isNotEmpty()) View.VISIBLE else View.GONE
                         
                         binding.tvCompletedHeader.text = getString(R.string.completed_tasks_count, completedTasks.size)
-                    }
-                }
-
-                launch {
-                    viewModel.productivityStats.collect { stats ->
-                        val completed = stats.first
-                        val pending = stats.second
-                        binding.tvSummary.text = getString(R.string.tasks_summary, pending, completed)
                     }
                 }
             }
